@@ -55,6 +55,20 @@ namespace Salty
             }
 
             /// <summary>
+            /// Creates a new one matrix. That is, a matrix with all entries being equal to 1.
+            /// </summary>
+            /// <param name="rowCount">The number of rows in the one matrix. Must be greater than zero.</param>
+            /// <param name="columnCount">The number of columns in the one matrix. Must be greater than zero.
+            /// </param>
+            /// <returns></returns>
+            public static Matrix One(int rowCount, int columnCount)
+            {
+                Matrix one = new Matrix(rowCount, columnCount);
+                one.Apply(x => 1f);
+                return one;
+            }
+
+            /// <summary>
             /// Creates a new unit matrix.
             /// </summary>
             /// <param name="size">The number of rows and columns in the unit matrix. Must be greater than zero.
@@ -108,6 +122,24 @@ namespace Salty
                 return a + (-b);
             }
 
+            public static Matrix Hadamard(Matrix a, Matrix b)
+            {
+                if (a.RowCount != b.RowCount || a.ColumnCount != b.ColumnCount)
+                {
+                    throw new ArgumentException("matrices must have the same dimensions for Hadamard product");
+                }
+                Matrix hadamard = new Matrix(a.RowCount, a.ColumnCount);
+                for (int row = 0; row < a.RowCount; row++)
+                {
+                    for (int col = 0; col < a.ColumnCount; col++)
+                    {
+                        hadamard[row, col] = a[row, col] * b[row, col];
+                    }
+                }
+
+                return hadamard;
+            }
+
             /// <summary>
             /// Multiplies two matrices together. This only works when the number of columns in the left matrix 
             /// equals the number of rows in the right matrix.
@@ -119,8 +151,8 @@ namespace Salty
             {
                 if (a.ColumnCount != b.RowCount)
                 {
-                    throw new ArgumentException("number of ColumnCount in left matrix must be equal to number of " +
-                        "RowCount in right matrix");
+                    throw new ArgumentException("number of columns in left matrix must be equal to number of " +
+                        "rows in right matrix");
                 }
 
                 // a.ColumnCount equals b.RowCount so just call this n

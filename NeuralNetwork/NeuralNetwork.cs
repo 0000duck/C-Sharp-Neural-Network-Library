@@ -12,6 +12,8 @@ namespace Salty.AI
 
         private Matrix[] activations, weights, biases;
 
+        private float learningRate;
+
         /// <summary>
         /// Initialises a neural network with random weights and biases.
         /// </summary>
@@ -25,6 +27,7 @@ namespace Salty.AI
 
             activations = new Matrix[Size];
 
+            learningRate = 0.8f;
 
  
             // Randomly initialise all the weights and biases as column vectors.
@@ -34,7 +37,9 @@ namespace Salty.AI
             for (int i = 0; i < Size - 1; i++)
             {
                 weights[i] = Matrix.Random(structure[i + 1], structure[i], rng);
-                biases[i] = Matrix.Random(structure[i + 1], 1, rng);
+
+                // Biases are all set to 1.
+                biases[i] = Matrix.One(structure[i + 1], 1);
             }         
         }
 
@@ -70,6 +75,44 @@ namespace Salty.AI
             return incomingWeights.Transpose() * getErrors(layerIndex + 1, expectedOutput);
         }
 
+        private void train(Matrix input, Matrix expectedOutput)
+        {
+            Console.WriteLine("Training on input:\n" + input + "expecting output of " + expectedOutput[0, 0]);
+
+            float[] actualOutput = feedForward(input.GetColumn(0));
+
+            Console.WriteLine("Got actual output of " + actualOutput[0]);
+
+            Console.WriteLine("Input layer errors:\n" + getErrors(0, expectedOutput) + "\n");
+            for (int i = 1; i < Size - 1; i++)
+            {
+                Console.WriteLine("Hidden layer #" + i + " errors:\n" + getErrors(i, expectedOutput));
+            }
+            Console.WriteLine("Output layer errors:\n" + getErrors(Size - 1, expectedOutput) + "\n");
+
+            for (int layerIndex = Size - 1; layerIndex > 0; layerIndex--)
+            {
+                Matrix activation = activations[layerIndex - 1];
+
+                // Adjust weights coming into the layer at layerIndex
+                Matrix deltaWeights =
+                    -learningRate
+                    * getErrors(layerIndex, expectedOutput)
+                    * activation.Transpose();
+
+                Console.WriteLine("Adjusting weights coming into layer " + layerIndex + ":\n");
+                Console.WriteLine(weights[layerIndex - 1]);
+                Console.WriteLine("by:\n");
+                Console.WriteLine(deltaWeights);
+
+                // Adjust biases on the layer at layerIndex
+                //Matrix deltaBiases;
+
+                weights[layerIndex - 1] -= deltaWeights;
+                //biases[layerIndex] += deltaBiases;
+            }
+        }
+
         public override string ToString()
         {
             string repr = "";
@@ -96,17 +139,23 @@ namespace Salty.AI
 
         public static void Main(string[] args)
         {
+            Random rng = new Random();
+
             Console.WriteLine("Neural networking expecting output of 0.5:\n");
             NeuralNetwork nn = new NeuralNetwork(2, 2, 1);
-            nn.feedForward(0f, 1f);
             Console.WriteLine(nn);
-            
-            Matrix expected = new Matrix(1, 1);
-            expected[0, 0] = 0.5f;
 
-            Console.WriteLine("Input errors:\n" + nn.getErrors(0, expected) + "\n");
-            Console.WriteLine("Hidden errors:\n" + nn.getErrors(1, expected) + "\n");
-            Console.WriteLine("Output errors:\n" + nn.getErrors(2, expected) + "\n");
+            for (int i = 0; i < 50; i++)
+            {
+                Matrix input = new Matrix(2, 1);
+                input[0, 0] = (float)Math.Round(rng.NextDouble());
+                input[1, 0] = (float)Math.Round(rng.NextDouble());
+
+                Matrix expected = new Matrix(1, 1);
+                expected[0, 0] = Xor(input[0, 0], input[1, 0]);
+
+                nn.train(input, expected);
+            }
 
             Console.ReadLine();
         }
@@ -117,10 +166,20 @@ namespace Salty.AI
         /// </summary>
         /// <param name="x">The float to shrink to the range [0, 1].</param>
         /// <returns>A number proportional to the input contracted to the range [0, 1].</returns>
-        public float Sigmoid(float x)
+        public static float Sigmoid(float x)
         {
             return (float)(1 / (1 + Math.Pow(Math.E, -x)));
         }
 
+        public static float DerivativeOfSigmoid(float x)
+        {
+            float s = Sigmoid(x);
+            return s * (1 - s);
+        }
+
+        public static float Xor(float a, float b)
+        {
+            return Math.Abs(a - b);
+        }
     }
 }
