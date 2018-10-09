@@ -43,21 +43,25 @@ namespace Salty.AI
             }         
         }
 
-        private float[] feedForward(params float[] input)
+        private void feedForward(Matrix input)
         {
-            if (input.Length != Structure[0])
-            {
-                throw new ArgumentException("input size must be compatible with network structure");
-            }
-
-            activations[0] = new Matrix(Structure[0], 1);
-            activations[0].SetColumn(0, input);
+            activations[0] = input;
 
             for (int i = 0; i < Size - 1; i++)
             {
                 activations[i + 1] = Matrix.Apply(weights[i] * activations[i] + biases[i], Sigmoid);
             }
+        }
 
+        public float[] Compute(params float[] input) {
+            if (input.Length != Structure[0])
+            {
+                throw new ArgumentException("input size must be compatible with network structure");
+            }
+
+            Matrix inputMatrix = new Matrix(Structure[0], 1);
+
+            feedForward(inputMatrix);
             return activations[Size - 1].GetColumn(0);
         }
 
@@ -75,42 +79,9 @@ namespace Salty.AI
             return incomingWeights.Transpose() * getErrors(layerIndex + 1, expectedOutput);
         }
 
-        private void train(Matrix input, Matrix expectedOutput)
+        public float Train(float[][] inputs, float[][] desiredOutputs)
         {
-            Console.WriteLine("Training on input:\n" + input + "expecting output of " + expectedOutput[0, 0]);
-
-            float[] actualOutput = feedForward(input.GetColumn(0));
-
-            Console.WriteLine("Got actual output of " + actualOutput[0]);
-
-            Console.WriteLine("Input layer errors:\n" + getErrors(0, expectedOutput) + "\n");
-            for (int i = 1; i < Size - 1; i++)
-            {
-                Console.WriteLine("Hidden layer #" + i + " errors:\n" + getErrors(i, expectedOutput));
-            }
-            Console.WriteLine("Output layer errors:\n" + getErrors(Size - 1, expectedOutput) + "\n");
-
-            for (int layerIndex = Size - 1; layerIndex > 0; layerIndex--)
-            {
-                Matrix activation = activations[layerIndex - 1];
-
-                // Adjust weights coming into the layer at layerIndex
-                Matrix deltaWeights =
-                    -learningRate
-                    * getErrors(layerIndex, expectedOutput)
-                    * activation.Transpose();
-
-                Console.WriteLine("Adjusting weights coming into layer " + layerIndex + ":\n");
-                Console.WriteLine(weights[layerIndex - 1]);
-                Console.WriteLine("by:\n");
-                Console.WriteLine(deltaWeights);
-
-                // Adjust biases on the layer at layerIndex
-                //Matrix deltaBiases;
-
-                weights[layerIndex - 1] -= deltaWeights;
-                //biases[layerIndex] += deltaBiases;
-            }
+            return 0f;
         }
 
         public override string ToString()
@@ -137,29 +108,6 @@ namespace Salty.AI
             return repr;
         }
 
-        public static void Main(string[] args)
-        {
-            Random rng = new Random();
-
-            Console.WriteLine("Neural networking expecting output of 0.5:\n");
-            NeuralNetwork nn = new NeuralNetwork(2, 2, 1);
-            Console.WriteLine(nn);
-
-            for (int i = 0; i < 50; i++)
-            {
-                Matrix input = new Matrix(2, 1);
-                input[0, 0] = (float)Math.Round(rng.NextDouble());
-                input[1, 0] = (float)Math.Round(rng.NextDouble());
-
-                Matrix expected = new Matrix(1, 1);
-                expected[0, 0] = Xor(input[0, 0], input[1, 0]);
-
-                nn.train(input, expected);
-            }
-
-            Console.ReadLine();
-        }
-
         /// <summary>
         /// A smooth function which takes any float and positions it proportionately in the range from 0 to 1
         /// (inclusive).
@@ -175,11 +123,6 @@ namespace Salty.AI
         {
             float s = Sigmoid(x);
             return s * (1 - s);
-        }
-
-        public static float Xor(float a, float b)
-        {
-            return Math.Abs(a - b);
         }
     }
 }
