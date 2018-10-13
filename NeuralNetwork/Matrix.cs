@@ -42,6 +42,13 @@ namespace Salty
                 this.data = new float[RowCount, ColumnCount];
             }
 
+            public Matrix(float[,] data)
+            {
+                RowCount = data.GetLength(0);
+                ColumnCount = data.GetLength(1);
+                this.data = data;
+            }
+
             /// <summary>
             /// Creates a new zero matrix.
             /// </summary>
@@ -99,6 +106,17 @@ namespace Salty
             }
 
             /// <summary>
+            /// Creates a new matrix with one column with values from the given array.
+            /// </summary>
+            /// <param name="column">The array whose values will fill this column matrix.</param>
+            /// <returns>The newly created column matrix.</returns>
+            public static Matrix FromArray(float[] column) 
+            {
+                Matrix matrix = new Matrix(column.Length, 1);
+                matrix.SetColumn(0, column);
+                return matrix;
+            }
+
             /// Adds two matrices of the same dimensions together.
             /// </summary>
             /// <param name="a">A matrix to be added.</param>
