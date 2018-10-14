@@ -173,6 +173,7 @@ namespace Salty
                         "rows in right matrix");
                 }
 
+                /*
                 // a.ColumnCount equals b.RowCount so just call this n
                 int n = a.ColumnCount;
 
@@ -201,7 +202,40 @@ namespace Salty
                 }
 
                 return product;
+                */
+
+                return UnsafeMultiplication(a, b);
             }
+
+    public unsafe static Matrix UnsafeMultiplication(Matrix m1, Matrix m2)
+    {
+       int h = m1.RowCount;
+       int w = m2.ColumnCount;
+       int l = m1.ColumnCount;
+       Matrix resultMatrix = new Matrix(h, w);
+       unsafe
+       {
+           fixed (float* pm = resultMatrix.data, pm1 = m1.data, pm2 = m2.data)
+           {
+               int i1, i2;
+               for (int i = 0; i < h; i++)
+               {
+                   i1 = i * l;
+                   for (int j = 0; j < w; j++)
+                   {
+                       i2 = j;
+                       float res = 0;
+                       for (int k = 0; k < l; k++, i2 += w)
+                       {
+                           res += pm1[i1 + k] * pm2[i2];
+                       }
+                       pm[i * w + j] = res;
+                   }
+               }
+           }
+       }
+       return resultMatrix;
+   }
 
             /// <summary>
             /// Returns a scaled copy of a matrix. This does not change the matrix.

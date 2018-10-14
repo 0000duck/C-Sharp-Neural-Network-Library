@@ -24,11 +24,15 @@ namespace Salty.AI
             weights = new Matrix[LayerCount - 1];
             biases = new Matrix[LayerCount - 1];
 
+            Console.WriteLine("Initialising neural network");
+
             for (int i = 0; i < LayerCount - 1; i++)
             {
                 weights[i] = Matrix.Random(Structure[i + 1], Structure[i], rng);
                 biases[i] = Matrix.Random(Structure[i + 1], 1, rng);
             }
+
+            Console.WriteLine("Neural network initialised");
         }
 
         private void feedForward(Matrix input)
@@ -46,20 +50,26 @@ namespace Salty.AI
             
             for (int i = 0; i < epochs; i++)
             {
+                Console.WriteLine("Beginning epoch " + i + " of " + epochs);
+                
                 // Randomise the training data
                 trainingData.Shuffle(rng);
 
                 // Pick out as many mini-batches as we can to cover al training data
                 int nMiniBatches = trainingData.SampleSize / miniBatchSize;
                 TrainingData[] miniBatches = new TrainingData[nMiniBatches];
+
                 for (int j = 0; j < nMiniBatches; j++)
                 {
                     miniBatches[j] = trainingData.GetMiniBatch(j * miniBatchSize, miniBatchSize);
                 }
 
+                int miniBatchIndex = 0;
                 foreach (TrainingData miniBatch in miniBatches)
                 {
+                    Console.WriteLine("Epoch " + i + " of " + epochs + ": Processing mini-batch " + miniBatchIndex + " of " + nMiniBatches);
                     stepGradientDescent(miniBatch, learningRate);
+                    miniBatchIndex++;
                 }
             }
         }
@@ -83,7 +93,7 @@ namespace Salty.AI
             {
                 Matrix input = Matrix.FromArray(miniBatch.GetInput(i));
                 Matrix expectedOutput = Matrix.FromArray(miniBatch.GetExpectedOutput(i));
-                
+            
                 Tuple<Matrix[], Matrix[]> direction = getCostGradient(input, expectedOutput);
                 
                 for (int l = 0; l < LayerCount - 1; l++)
@@ -170,7 +180,7 @@ namespace Salty.AI
 
         public static float Sigmoid(float x)
         {
-            return (float)(1 / (1 + Math.Pow(Math.E, -x)));
+            return (1f / (1f + (float) Math.Pow(Math.E, -x)));
         }
 
         public static float DerivativeOfSigmoid(float x)
