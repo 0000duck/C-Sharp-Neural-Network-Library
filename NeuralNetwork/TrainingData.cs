@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using static Salty.Maths;
+using System.Collections;
 
 namespace Salty.AI {
 
@@ -89,5 +90,6 @@ namespace Salty.AI {
             return "INPUTS\n" + inputs.ToString() + 
                 "\nEXPECTED OUTPUTS\n" + expectedOutputs.ToString();
         }
+
     }
 }

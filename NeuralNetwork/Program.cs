@@ -25,6 +25,26 @@ class Program
         TrainingData td = new TrainingData(inputs, expectedOutputs);
         
         NeuralNetwork nn = new NeuralNetwork(2, 2, 1);
-        nn.Train(td, 0.01f, 10, 2);
+        do
+        {
+            nn.Train(td, 0.1f, 5, 3);
+            Console.WriteLine(nn.Cost);
+        } 
+        while (nn.Cost > 0.001);
+
+        float[] test = nn.Compute(0, 0);
+        Console.WriteLine("Guess for 0 XOR 0: " + test[0]);
+
+        test = nn.Compute(0, 1);
+        Console.WriteLine("Guess for 0 XOR 1: " + test[0]);
+
+        test = nn.Compute(1, 0);
+        Console.WriteLine("Guess for 1 XOR 0: " + test[0]);
+
+        test = nn.Compute(1, 1);
+        Console.WriteLine("Guess for 1 XOR 1: " + test[0]);
+
+        Console.WriteLine(nn);
+
     }
 }
