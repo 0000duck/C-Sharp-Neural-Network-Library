@@ -2,11 +2,18 @@
 using static Salty.Maths;
 using Salty.AI;
 using Mnist;
+using System.IO;
 
 class Program
 {
     public static void Main(string[] args)
     {
+        FileStream filestream = new FileStream("out.txt", FileMode.Create);
+        StreamWriter streamwriter = new StreamWriter(filestream);
+        streamwriter.AutoFlush = true;
+        Console.SetOut(streamwriter);
+        Console.SetError(streamwriter);
+
         Random rng = new Random();
 
         float[,] inputs = new float[60000, 784];
@@ -60,5 +67,7 @@ class Program
             Console.WriteLine("Cost this iteration: " + nn.Cost);
         } 
         while (nn.Cost > 0.2);
+
+        Console.WriteLine(nn);
     }
 }
