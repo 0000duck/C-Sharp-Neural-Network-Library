@@ -530,8 +530,7 @@ namespace Salty
             }
 
             /// <summary>Returns a <see cref="System.String" /> that represents 
-            /// the current matrix.
-            /// </summary>
+            /// the current matrix.</summary>
             /// <returns>A <see cref="System.String" /> that represents the 
             /// current matrix.</returns>
             public override string ToString()
@@ -607,9 +606,9 @@ namespace Salty
                 return hashCode;
             }
 
-            /// <summary>Private helper function. ThRowCount an exception if 
-            /// the position at the specified row and column in the current 
-            /// matrix is invalid. </summary>
+            /// <summary>Private helper function. Throw an exception if the 
+            /// position at the specified row and column in the current matrix 
+            /// is invalid. </summary>
             /// <param name="row">The row to check validity.</param>
             /// <param name="col">The column to check validity.</param>
             private void HandleIndexException(int row, int col)

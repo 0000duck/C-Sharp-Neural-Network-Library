@@ -1,21 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Salty
+﻿namespace Salty
 {
+    /// <summary>A static class for maths-related functions.</summary>
     public static partial class Maths
     {
-        public static float[] Apply(float[] nums, Func<float, float> function)
-        {
-            float[] appliedNums = { };
-            for (int i = 0; i < nums.Length; i++)
-            {
-                appliedNums[i] = function(nums[i]);
-            }
-            return appliedNums;
-        }
-
+        /// <summary>Returns the sum of all elements in an array.</summary>
+        /// <param name="nums">The floating point numbers to make up the 
+        /// elements of the array to sum.</param>
+        /// <returns>The sum of the all elements in the array.</returns>
         public static float Sum(params float[] nums)
         {
             float sum = 0f;

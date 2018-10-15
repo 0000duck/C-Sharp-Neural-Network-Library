@@ -3,17 +3,49 @@ using static Salty.Maths;
 
 namespace Salty.AI
 {
+    /// <summary>Represents a feed-forward multi-layer perception, or neural 
+    /// network, with no loops. The network trains with Stochastic gradient 
+    /// descent using back propagation. The activation function for neurons is 
+    /// the sigmoid/logistic function. The inputs and outputs are floating 
+    /// point numbers. The network uses the quadratic cost function. </summary>
     public class NeuralNetwork
     {
+        /// <summary>The number of layers in the current network.</summary>
         public readonly int LayerCount;
+
+        /// <summary>The structure of the current network. That is, a list of 
+        /// numbers representing the number of neurons in each layer, starting 
+        /// with the number of inputs and ending with the number of outputs.
+        /// </summary>
         public readonly int[] Structure;
 
-        public float Cost;
+        /// <summary>The cost of the current network. This is calculated during 
+        /// training using the quadratic cost function.</summary>
+        public float Cost
+        {
+            get;
+            private set;
+        }
 
+        /// <summary>The random number generator for the current network.
+        /// </summary>
         private readonly Random rng;
 
-        private Matrix[] activations, weights, biases;
+        /// <summary>The activations of the neurons in each layer. That is, an 
+        /// array of column vectors representing the activation value of the 
+        /// neurons in each layer.</summary>
+        private Matrix[] activations;
 
+        /// <summary>The weight matrices for each layer.</summary>
+        private Matrix[] weights;
+
+        /// <summary>The biases of the neurons in each layer.</summary>
+        private Matrix[] biases;
+
+        /// <summary>Initialises the current network with the given structure. 
+        /// Sets all weights and biases to random values between -1 (inclusive) 
+        /// and 1 (exclusive).</summary>
+        /// <param name="structure"></param>
         public NeuralNetwork(params int[] structure) 
         {
             this.rng = new Random();
@@ -24,77 +56,103 @@ namespace Salty.AI
             weights = new Matrix[LayerCount - 1];
             biases = new Matrix[LayerCount - 1];
 
-            Console.WriteLine("Initialising neural network");
-
             for (int i = 0; i < LayerCount - 1; i++)
             {
-                weights[i] = Matrix.Random(Structure[i + 1], Structure[i], rng);
+                weights[i]= Matrix.Random(Structure[i + 1], Structure[i], rng);
                 biases[i] = Matrix.Random(Structure[i + 1], 1, rng);
             }
-
-            Console.WriteLine("Neural network initialised");
         }
 
+        /// <summary>Feeds the input forward through the network to produce the 
+        /// corresponding output.</summary>
+        /// <param name="input">The input to feed forward through the network.
+        /// </param>
         private void feedForward(Matrix input)
         {
             activations[0] = input;
             for (int i = 0; i < LayerCount - 1; i++)
             {
-                activations[i + 1] = Matrix.Apply(weights[i] * activations[i] + biases[i], Sigmoid);
+                activations[i + 1] = Matrix.Apply(weights[i] * activations[i] + 
+                    biases[i], Sigmoid);
             }
         }
 
-        public void Train(TrainingData trainingData, float learningRate, int epochs, int miniBatchSize)
+        /// <summary>Trains the current network on the given training data, 
+        /// with the given learning rate using Stochastic gradient descent. 
+        /// Covers the training data in mini-batches of the given size for each 
+        /// epoch.</summary>
+        /// <param name="trainingData">The training data to train on.</param>
+        /// <param name="learningRate">The constant rate of learning overal all 
+        /// epochs.</param>
+        /// <param name="nEpochs">The number of epochs to train over.</param>
+        /// <param name="miniBatchSize">The size of each mini-batch.</param>
+        public void Train(TrainingData trainingData, 
+            float learningRate, int nEpochs, int miniBatchSize)
         {
             miniBatchSize = Math.Min(miniBatchSize, trainingData.SampleSize);
             
-            for (int i = 0; i < epochs; i++)
+            for (int i = 0; i < nEpochs; i++)
             {
-                Console.WriteLine("Beginning epoch " + i + " of " + epochs);
-                
                 // Randomise the training data
                 trainingData.Shuffle(rng);
 
-                // Pick out as many mini-batches as we can to cover al training data
+                /* Pick out as many mini-batches as we can to cover al training 
+                 * data */
                 int nMiniBatches = trainingData.SampleSize / miniBatchSize;
                 TrainingData[] miniBatches = new TrainingData[nMiniBatches];
 
                 for (int j = 0; j < nMiniBatches; j++)
                 {
-                    miniBatches[j] = trainingData.GetMiniBatch(j * miniBatchSize, miniBatchSize);
+                    miniBatches[j] = trainingData.GetMiniBatch(
+                        j * miniBatchSize, miniBatchSize);
                 }
 
-                int miniBatchIndex = 0;
-                foreach (TrainingData miniBatch in miniBatches)
+                for (int j = 0; j < nMiniBatches; j++)
                 {
-                    Console.WriteLine("Epoch " + i + " of " + epochs + ": Processing mini-batch " + miniBatchIndex + " of " + nMiniBatches);
+                    TrainingData miniBatch = miniBatches[j];
+                    Console.WriteLine(
+                        "Epoch " + i + " of " + nEpochs + ": Processing mini-" +
+                        "batch " + j + " of " + nMiniBatches);
                     stepGradientDescent(miniBatch, learningRate);
-                    miniBatchIndex++;
                 }
             }
         }
 
-        private void stepGradientDescent(TrainingData miniBatch, float learningRate)
+        /// <summary>Performs one step of gradient descent according to the 
+        /// current network's cost after training on the given mini-batch of 
+        /// training data. Updates all weights and biases according to the 
+        /// gradient of the cost function in the network's current 
+        /// configuration.</summary>
+        /// <param name="miniBatch">The mini-batch of training data to use for 
+        /// determining the cost of the current network.</param>
+        /// <param name="learningRate">The gradient descent step size.</param>
+        private void stepGradientDescent(TrainingData miniBatch, 
+            float learningRate)
         {
             int miniBatchSize = miniBatch.SampleSize;
 
             Matrix[] weightsDirection = new Matrix[LayerCount - 1];
             Matrix[] biasesDirection = new Matrix[LayerCount - 1];
 
-            // Initialise the direction matrices to be of the same dimensions as the weights and biases
+            /* Initialise the direction matrices to be of the same dimensions 
+             * as the weights and biases */
             for (int i = 0; i < LayerCount - 1; i++)
             {
-                weightsDirection[i] = new Matrix(weights[i].RowCount, weights[i].ColumnCount);
+                weightsDirection[i] = new Matrix(weights[i].RowCount, 
+                    weights[i].ColumnCount);
                 biasesDirection[i] = new Matrix(biases[i].RowCount, 1);
             }
-            
-            // Sum the steps of weights and biases for each training example in the mini-batch
+
+            /* Sum the steps of weights and biases for each training example in 
+             * the mini-batch */
             for (int i = 0; i < miniBatchSize; i++)
             {
                 Matrix input = Matrix.FromArray(miniBatch.GetInput(i));
-                Matrix expectedOutput = Matrix.FromArray(miniBatch.GetExpectedOutput(i));
+                Matrix expectedOutput = Matrix.FromArray(
+                    miniBatch.GetExpectedOutput(i));
             
-                Tuple<Matrix[], Matrix[]> direction = getCostGradient(input, expectedOutput);
+                Tuple<Matrix[], Matrix[]> direction = getCostGradient(
+                    input, expectedOutput);
                 
                 for (int l = 0; l < LayerCount - 1; l++)
                 {
@@ -105,12 +163,25 @@ namespace Salty.AI
 
             for (int l = 0; l < LayerCount - 1; l++)
             {
-                weights[l] -= (learningRate / (float) miniBatchSize) * weightsDirection[l];
-                biases[l] -= (learningRate / (float) miniBatchSize) * biasesDirection[l];
+                weights[l] -= 
+                    (learningRate / miniBatchSize) * weightsDirection[l];
+                biases[l] -= 
+                    (learningRate / miniBatchSize) * biasesDirection[l];
             }
         }
 
-        private Tuple<Matrix[], Matrix[]> getCostGradient(Matrix input, Matrix expectedOutput)
+        /// <summary>Returns the gradient of the cost function with respect to 
+        /// each weight and bias in the current network for a given training 
+        /// example. This determines the direction of a gradient descent step.
+        /// </summary>
+        /// <param name="input">The input for a training example to use in 
+        /// determining the gradient of the cost.</param>
+        /// <param name="expectedOutput">The expected output for a training 
+        /// example to use in determining the gradient of the cost.</param>
+        /// <returns>the gradient of the cost function with respect to each 
+        /// weight and bias in the current network.</returns>
+        private Tuple<Matrix[], Matrix[]> getCostGradient(Matrix input, 
+            Matrix expectedOutput)
         {
             Matrix[] weightsDirection = new Matrix[LayerCount - 1];
             Matrix[] biasesDirection = new Matrix[LayerCount - 1];
@@ -120,33 +191,41 @@ namespace Salty.AI
             feedForward(input);
 
             // Update the cost
-            Matrix squaredDifferences = Matrix.Apply(expectedOutput - activations[LayerCount - 1], x => x * x);
+            Matrix squaredDifferences = Matrix.Apply(
+                expectedOutput - activations[LayerCount - 1], 
+                x => x * x);
             Cost = Maths.Sum(squaredDifferences.GetColumn(0)) / 2f;
 
             // Calculate the output error
             errors[errors.Length - 1] = Matrix.Hadamard(
                 activations[LayerCount - 1] - expectedOutput, 
-                Matrix.Apply(weights[LayerCount - 2] * activations[LayerCount - 2] + biases[LayerCount - 2], DerivativeOfSigmoid)
+                Matrix.Apply(weights[LayerCount - 2] * 
+                activations[LayerCount - 2] + biases[LayerCount - 2], 
+                DerivativeOfSigmoid)
             );
 
-            // Calculate the rest of the errors, moving backwards through the network
+            /* Calculate the rest of the errors, moving backwards through the 
+             * network */
             for (int l = LayerCount - 3; l >= 0; l--)
             {
                 errors[l] = Matrix.Hadamard(
                     weights[l + 1].Transpose() * errors[l + 1],
-                    Matrix.Apply(weights[l] * activations[l] + biases[l], DerivativeOfSigmoid)
+                    Matrix.Apply(weights[l] * activations[l] + biases[l], 
+                    DerivativeOfSigmoid)
                 );
             }
 
-            /* The rate of change of the cost with respect a neuron's bias is exactly 
-             * equal to the error from the neuron */
+            /* The rate of change of the cost with respect a neuron's bias is 
+             * exactly equal to the error from the neuron */
             biasesDirection = errors;
 
-            // Calculate the rate of change of the cost with respect to all the weights
+            /* Calculate the rate of change of the cost with respect to all the 
+             * weights */
             for (int l = 0; l < LayerCount - 1; l++)
             {
                 // The weight directions matrix from layer l to layer (l + 1)
-                Matrix weightDirection = new Matrix(weights[l].RowCount, weights[l].ColumnCount);
+                Matrix weightDirection = 
+                    new Matrix(weights[l].RowCount, weights[l].ColumnCount);
 
                 for (int i = 0; i < Structure[l + 1]; i++)
                 {
@@ -155,16 +234,24 @@ namespace Salty.AI
                         /* Calculate rate of change of the cost with respect to 
                          * the weight from the "j"th neuron in layer l to 
                          * the "i"th neuron in layer (l + 1) */
-                        weightDirection[i, j] = activations[l][j, 0] * errors[l][i, 0];
+                        weightDirection[i, j] = 
+                            activations[l][j, 0] * errors[l][i, 0];
                     }
                 }
 
                 weightsDirection[l] = weightDirection;
             }
 
-            return new Tuple<Matrix[], Matrix[]>(weightsDirection, biasesDirection);
+            return new Tuple<Matrix[], Matrix[]>(weightsDirection, 
+                biasesDirection);
         }
 
+        /// <summary>Returns the current network's output for the given input.
+        /// </summary>
+        /// <param name="input">The input to feed forward through the current 
+        /// network.</param>
+        /// <returns>The current network's output for the given input.
+        /// </returns>
         public float[] Compute(params float[] input) 
         {
             activations[0] = Matrix.FromArray(input);
@@ -172,23 +259,31 @@ namespace Salty.AI
             return activations[LayerCount - 1].GetColumn(0);
         }
 
-        private Matrix compute(Matrix input) 
-        {
-            feedForward(input);
-            return activations[LayerCount - 1];
-        }
-
+        /// <summary>The sigmoid/logistic function which serves as the 
+        /// activation function for the current network.</summary>
+        /// <param name="x">The input to this function.</param>
+        /// <returns>The output to the sigmoid/logistic function for the given 
+        /// input.</returns>
         public static float Sigmoid(float x)
         {
             return (1f / (1f + (float) Math.Pow(Math.E, -x)));
         }
 
+        /// <summary>The derivative of the sigmoid/logistic function.</summary>
+        /// <param name="x">The input to evaluate the derivative of the 
+        /// sigmoid/logistic function at.</param>
+        /// <returns>The value of the derivative of the sigmoid/logistic 
+        /// function evaluated at the given input.</returns>
         public static float DerivativeOfSigmoid(float x)
         {
             float s = Sigmoid(x);
             return s * (1 - s);
         }
 
+        /// <summary>Returns a <see cref="System.String" /> that represents 
+        /// the current network.</summary>
+        /// <returns>A <see cref="System.String" /> that represents the 
+        /// current matrix.</returns>
         public override string ToString()
         {
             string repr = "";
