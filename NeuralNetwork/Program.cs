@@ -1,5 +1,4 @@
 ﻿using System;
-using static Salty.Maths;
 using Salty.AI;
 using Mnist;
 using System.IO;
@@ -11,8 +10,8 @@ class Program
         FileStream filestream = new FileStream("out.txt", FileMode.Create);
         StreamWriter streamwriter = new StreamWriter(filestream);
         streamwriter.AutoFlush = true;
-        Console.SetOut(streamwriter);
-        Console.SetError(streamwriter);
+        //Console.SetOut(streamwriter);
+        //Console.SetError(streamwriter);
 
         Random rng = new Random();
 
@@ -58,12 +57,12 @@ class Program
 
         Console.Write("Training data filled into stucture.");
         
-        NeuralNetwork nn = new NeuralNetwork(784, 30, 10);
+        NeuralNetwork nn = new NeuralNetwork(784, 10);
 
         Console.WriteLine("Beginning training.");
         do
         {
-            nn.Train(td, 5f, 1, 32);
+            nn.Train(td, 3f, 1, 32);
             Console.WriteLine("Cost this iteration: " + nn.Cost);
         } 
         while (nn.Cost > 0.2);
