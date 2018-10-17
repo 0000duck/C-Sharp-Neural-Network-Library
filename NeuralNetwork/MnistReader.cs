@@ -6,10 +6,10 @@ namespace Mnist
 {
     public static class Reader
     {
-        private const string TrainImages = "mnist/train-images.idx3-ubyte";
-        private const string TrainLabels = "mnist/train-labels.idx1-ubyte";
-        private const string TestImages = "mnist/t10k-images.idx3-ubyte";
-        private const string TestLabels = "mnist/t10k-labels.idx1-ubyte";
+        private const string TrainImages = @"mnist/train-images.idx3-ubyte";
+        private const string TrainLabels = @"mnist/train-labels.idx1-ubyte";
+        private const string TestImages = @"mnist/t10k-images.idx3-ubyte";
+        private const string TestLabels = @"mnist/t10k-labels.idx1-ubyte";
 
         public static IEnumerable<Image> ReadTrainingData()
         {

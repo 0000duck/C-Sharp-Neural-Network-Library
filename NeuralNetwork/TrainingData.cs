@@ -124,7 +124,7 @@ namespace Salty.AI {
 
                 for (int j = 0; j < OutputSize; j++)
                 {
-                    miniBatchOutputs[i, j] = expectedOutputs[i + startIndex, j];
+                    miniBatchOutputs[i,j] = expectedOutputs[i + startIndex, j];
                 }
             }
 
@@ -140,6 +140,5 @@ namespace Salty.AI {
             return "INPUTS\n" + inputs.ToString() + 
                 "\nEXPECTED OUTPUTS\n" + expectedOutputs.ToString();
         }
-
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
 using static Salty.Maths;
+using static System.IO.File;
+using System.Collections.Generic;
 
 namespace Salty.AI
 {
@@ -73,7 +75,7 @@ namespace Salty.AI
             for (int i = 0; i < LayerCount - 1; i++)
             {
                 activations[i + 1] = Matrix.Apply(weights[i] * activations[i] + 
-                    biases[i], Sigmoid);
+                    biases[i], sigmoid);
             }
         }
 
@@ -111,8 +113,8 @@ namespace Salty.AI
                 {
                     TrainingData miniBatch = miniBatches[j];
                     Console.WriteLine(
-                        "Epoch " + i + " of " + nEpochs + ": Processing mini-" +
-                        "batch " + j + " of " + nMiniBatches);
+                        "Epoch " + i + " of " + nEpochs + ": Processing mini" +
+                        "-batch " + j + " of " + nMiniBatches);
                     stepGradientDescent(miniBatch, learningRate);
                 }
             }
@@ -201,7 +203,7 @@ namespace Salty.AI
                 activations[LayerCount - 1] - expectedOutput, 
                 Matrix.Apply(weights[LayerCount - 2] * 
                 activations[LayerCount - 2] + biases[LayerCount - 2], 
-                DerivativeOfSigmoid)
+                derivativeOfSigmoid)
             );
 
             /* Calculate the rest of the errors, moving backwards through the 
@@ -211,7 +213,7 @@ namespace Salty.AI
                 errors[l] = Matrix.Hadamard(
                     weights[l + 1].Transpose() * errors[l + 1],
                     Matrix.Apply(weights[l] * activations[l] + biases[l], 
-                    DerivativeOfSigmoid)
+                    derivativeOfSigmoid)
                 );
             }
 
@@ -259,12 +261,42 @@ namespace Salty.AI
             return activations[LayerCount - 1].GetColumn(0);
         }
 
+        public void Save(string filePath)
+        {
+            List<string> lines = new List<string>();
+            for (int l = 0; l < LayerCount; l++)
+            {
+                string line = String.Format("<Layer Name=\"L{0}\">\n", l);
+                for (int i = 0; i < Structure[l]; i++)
+                {
+                    line += String.Format("\t<Neuron Name=\"N{1}\" " +
+                        "Bias=\"{2}\">\n", l, i, biases[l][i, 0]);
+                    if (l > 0)
+                    {
+                        line += "\t<IncomingWeights>\n";
+                        for (int j = 0; j < Structure[l - 1]; j++)
+                        {
+                            line += String.Format(
+                                "\t\t<Weight Layer=\"L{0}\" Neuron=\"{1}\" " +
+                                "Strength=\"{2}\" />\n", 
+                                l - 1, j, weights[l - 1][i, j]);
+                        }
+                        line += "\t</IncomingWeights>\n";
+                    }
+                    line += "\t</Neuron>\n";
+                }
+                line += "</Layer>\n";
+                lines.Add(line);
+            }
+            System.IO.File.WriteAllLines(filePath, lines);
+        }
+
         /// <summary>The sigmoid/logistic function which serves as the 
         /// activation function for the current network.</summary>
         /// <param name="x">The input to this function.</param>
         /// <returns>The output to the sigmoid/logistic function for the given 
         /// input.</returns>
-        public static float Sigmoid(float x)
+        private static float sigmoid(float x)
         {
             return (1f / (1f + (float) Math.Pow(Math.E, -x)));
         }
@@ -274,9 +306,9 @@ namespace Salty.AI
         /// sigmoid/logistic function at.</param>
         /// <returns>The value of the derivative of the sigmoid/logistic 
         /// function evaluated at the given input.</returns>
-        public static float DerivativeOfSigmoid(float x)
+        private static float derivativeOfSigmoid(float x)
         {
-            float s = Sigmoid(x);
+            float s = sigmoid(x);
             return s * (1 - s);
         }
 
