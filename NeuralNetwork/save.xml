@@ -1,0 +1,24 @@
+<Layer Name="L1">
+	<Neuron Name="N0" Bias="0.4382714">
+		<IncomingWeights>
+			<Weight Layer="L0" Neuron="0" Strength="0.1976444" />
+			<Weight Layer="L0" Neuron="1" Strength="-0.4491514" />
+		</IncomingWeights>
+	</Neuron>
+	<Neuron Name="N1" Bias="0.09913373">
+		<IncomingWeights>
+			<Weight Layer="L0" Neuron="0" Strength="0.8459195" />
+			<Weight Layer="L0" Neuron="1" Strength="-0.09033686" />
+		</IncomingWeights>
+	</Neuron>
+</Layer>
+
+<Layer Name="L2">
+	<Neuron Name="N0">
+		<IncomingWeights>
+			<Weight Layer="L1" Neuron="0" Strength="-0.7814643" />
+			<Weight Layer="L1" Neuron="1" Strength="-0.9295731" />
+		</IncomingWeights>
+	</Neuron>
+</Layer>
+

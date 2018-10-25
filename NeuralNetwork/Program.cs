@@ -7,7 +7,7 @@ class Program
 {
     public static void Main(string[] args)
     {
-        FileStream filestream = new FileStream("out.txt", FileMode.Create);
+        /*FileStream filestream = new FileStream("out.txt", FileMode.Create);
         StreamWriter streamwriter = new StreamWriter(filestream);
         streamwriter.AutoFlush = true;
         //Console.SetOut(streamwriter);
@@ -18,8 +18,6 @@ class Program
         float[,] inputs = new float[60000, 784];
 
         float[,] expectedOutputs = new float[60000, 10];
-
-        Console.WriteLine("Loading training data 0%");
 
         int exampleIndex = 0;
         foreach (Image image in Mnist.Reader.ReadTrainingData())
@@ -51,22 +49,46 @@ class Program
             exampleIndex++;
         }
 
+        NeuralNetwork nn = new NeuralNetwork(784, 10);*/
+
+        float[,] xorIn = {
+            {0f, 0f}, {0f, 1f}, {1f, 0f}, {1f, 1f}
+        };
+
+        float[,] xorOut = {
+            {0f}, {1f}, {1f}, {0f}
+        };
+
+        TrainingData xorTrain = new TrainingData(xorIn, xorOut);
+
+        NeuralNetwork nn = new NeuralNetwork(2, 2, 1);
+        do {        
+            nn.Train(xorTrain, 0f, 1, 1);
+            Console.WriteLine("Cost: " + nn.Cost);
+        } while (nn.Cost > 0.06);
+
+        Console.WriteLine(nn.Compute(0f, 0f)[0]);
+        Console.WriteLine(nn.Compute(0f, 1f)[0]);
+        Console.WriteLine(nn.Compute(1f, 0f)[0]);
+        Console.WriteLine(nn.Compute(1f, 1f)[0]);
+
+        nn.Save("save.xml");
+/*
         Console.Write("Training data arrays initialised.");
 
         TrainingData td = new TrainingData(inputs, expectedOutputs);
 
         Console.Write("Training data filled into stucture.");
-        
-        NeuralNetwork nn = new NeuralNetwork(784, 10);
 
         Console.WriteLine("Beginning training.");
         do
         {
-            nn.Train(td, 3f, 1, 32);
+            nn.Train(td, 3f, 1, 128);
             Console.WriteLine("Cost this iteration: " + nn.Cost);
         } 
-        while (nn.Cost > 0.2);
+        while (false);
 
         Console.WriteLine(nn);
+*/
     }
 }

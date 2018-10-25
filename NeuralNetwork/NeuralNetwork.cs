@@ -89,7 +89,7 @@ namespace Salty.AI
         /// <param name="nEpochs">The number of epochs to train over.</param>
         /// <param name="miniBatchSize">The size of each mini-batch.</param>
         public void Train(TrainingData trainingData, 
-            float learningRate, int nEpochs, int miniBatchSize)
+            float learningRate, int nEpochs, int miniBatchSize, bool log = false)
         {
             miniBatchSize = Math.Min(miniBatchSize, trainingData.SampleSize);
             
@@ -112,9 +112,12 @@ namespace Salty.AI
                 for (int j = 0; j < nMiniBatches; j++)
                 {
                     TrainingData miniBatch = miniBatches[j];
-                    Console.WriteLine(
-                        "Epoch " + i + " of " + nEpochs + ": Processing mini" +
-                        "-batch " + j + " of " + nMiniBatches);
+                    if (log)
+                    {
+                        Console.WriteLine(
+                            "Epoch " + i + " of " + nEpochs + ": Processing mini" +
+                            "-batch " + j + " of " + nMiniBatches);
+                    }
                     stepGradientDescent(miniBatch, learningRate);
                 }
             }
@@ -256,7 +259,6 @@ namespace Salty.AI
         /// </returns>
         public float[] Compute(params float[] input) 
         {
-            activations[0] = Matrix.FromArray(input);
             feedForward(Matrix.FromArray(input));
             return activations[LayerCount - 1].GetColumn(0);
         }
@@ -264,26 +266,24 @@ namespace Salty.AI
         public void Save(string filePath)
         {
             List<string> lines = new List<string>();
-            for (int l = 0; l < LayerCount; l++)
+            for (int l = 1; l < LayerCount; l++)
             {
-                string line = String.Format("<Layer Name=\"L{0}\">\n", l);
+                string line = $"<Layer Name=\"L{l}\">\n";
                 for (int i = 0; i < Structure[l]; i++)
                 {
-                    line += String.Format("\t<Neuron Name=\"N{1}\" " +
-                        "Bias=\"{2}\">\n", l, i, biases[l][i, 0]);
-                    if (l > 0)
+                    line += $"\t<Neuron Name=\"N{i}\"";
+                    if (l < LayerCount - 1)
                     {
-                        line += "\t<IncomingWeights>\n";
-                        for (int j = 0; j < Structure[l - 1]; j++)
-                        {
-                            line += String.Format(
-                                "\t\t<Weight Layer=\"L{0}\" Neuron=\"{1}\" " +
-                                "Strength=\"{2}\" />\n", 
-                                l - 1, j, weights[l - 1][i, j]);
-                        }
-                        line += "\t</IncomingWeights>\n";
+                        line += $" Bias=\"{biases[l - 1][i, 0]}\"";
                     }
-                    line += "\t</Neuron>\n";
+
+                    line += $">\n\t\t<IncomingWeights>\n";
+                    for (int j = 0; j < Structure[l - 1]; j++)
+                    {
+                        line += $"\t\t\t<Weight Layer=\"L{l - 1}\" Neuron=\"{j}\" Strength=\"{weights[l - 1][i, j]}\" />\n";
+                    }
+                    
+                    line += "\t\t</IncomingWeights>\n\t</Neuron>\n";
                 }
                 line += "</Layer>\n";
                 lines.Add(line);

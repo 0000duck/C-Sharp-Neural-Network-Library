@@ -36,7 +36,7 @@ namespace Salty.AI {
         /// array.</param>
         public TrainingData(float[,] inputs, float[,] expectedOutputs)
         {
-            if (inputs.GetLength(1) != expectedOutputs.GetLength(1))
+            if (inputs.GetLength(0) != expectedOutputs.GetLength(0))
             {
                 throw new ArgumentException("sample size must be equal for " +
                     "both input and expected output");
