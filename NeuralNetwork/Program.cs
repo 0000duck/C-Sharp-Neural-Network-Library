@@ -63,9 +63,9 @@ class Program
 
         NeuralNetwork nn = new NeuralNetwork(2, 2, 1);
         do {        
-            nn.Train(xorTrain, 0f, 1, 1);
+            nn.Train(xorTrain, 0.1f, 5, 3);
             Console.WriteLine("Cost: " + nn.Cost);
-        } while (nn.Cost > 0.06);
+        } while (nn.Cost > 0.001);
 
         Console.WriteLine(nn.Compute(0f, 0f)[0]);
         Console.WriteLine(nn.Compute(0f, 1f)[0]);

@@ -55,17 +55,28 @@ namespace Salty.AI {
         /// training data set.</param>
         public void Shuffle(Random rng)
         {
-            int seed = rng.Next();
-            Random r = new Random(seed);
-            
-            float[] inputsArray = inputs.GetColumn(0);
-            float[] outputsArray = expectedOutputs.GetColumn(0);
+            int[] randIndices = new int[SampleSize];
+            for (int i = 0; i < SampleSize - 1; i++)
+            {
+                int randIndex = rng.Next(SampleSize);
+                while (randIndices.Contains(randIndex))
+                {
+                    randIndex = rng.Next(SampleSize);
+                }
+                randIndices[i] = randIndex;
+            }
 
-            inputsArray = inputsArray.OrderBy(x => r.Next()).ToArray();
-            outputsArray = outputsArray.OrderBy(x => r.Next()).ToArray();
+            Matrix randInputs = new Matrix(SampleSize, InputSize);
+            Matrix randOutputs = new Matrix(SampleSize, OutputSize);
+            for (int i = 0; i < SampleSize; i++)
+            {
+                int randIndex = randIndices[i];
+                randInputs.SetRow(i, inputs.GetRow(randIndex));
+                randOutputs.SetRow(i, expectedOutputs.GetRow(randIndex));
+            }
 
-            inputs.SetColumn(0, inputsArray);
-            expectedOutputs.SetColumn(0, outputsArray);;
+            inputs = randInputs;
+            expectedOutputs = randOutputs;
         }
 
         /// <summary>Returns the input at the given index into the current 
