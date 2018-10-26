@@ -263,24 +263,28 @@ namespace Salty.AI
             return activations[LayerCount - 1].GetColumn(0);
         }
 
+        /// <summary>Saves the current network in an XML format to the desired 
+        /// path.</summary>
+        /// <param name="filePath">The system path to save to.</param>
         public void Save(string filePath)
         {
             List<string> lines = new List<string>();
-            for (int l = 1; l < LayerCount; l++)
+            
+            for (int l = 0; l < LayerCount; l++)
             {
                 string line = $"<Layer Name=\"L{l}\">\n";
                 for (int i = 0; i < Structure[l]; i++)
                 {
                     line += $"\t<Neuron Name=\"N{i}\"";
-                    if (l < LayerCount - 1)
+                    if (l == 0)
                     {
-                        line += $" Bias=\"{biases[l - 1][i, 0]}\"";
+                        line += " />\n";
+                        continue;
                     }
-
-                    line += $">\n\t\t<IncomingWeights>\n";
+                    line += $" Bias=\"{biases[l - 1][i, 0]}\">\n\t\t<IncomingWeights>\n";
                     for (int j = 0; j < Structure[l - 1]; j++)
                     {
-                        line += $"\t\t\t<Weight Layer=\"L{l - 1}\" Neuron=\"{j}\" Strength=\"{weights[l - 1][i, j]}\" />\n";
+                        line += $"\t\t\t<Weight Layer=\"L{l - 1}\" Neuron=\"N{j}\" Strength=\"{weights[l - 1][i, j]}\" />\n";
                     }
                     
                     line += "\t\t</IncomingWeights>\n\t</Neuron>\n";

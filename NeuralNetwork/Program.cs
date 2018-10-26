@@ -61,11 +61,11 @@ class Program
 
         TrainingData xorTrain = new TrainingData(xorIn, xorOut);
 
-        NeuralNetwork nn = new NeuralNetwork(2, 2, 1);
+        NeuralNetwork nn = new NeuralNetwork(2, 3, 1);
         do {        
             nn.Train(xorTrain, 0.1f, 5, 3);
             Console.WriteLine("Cost: " + nn.Cost);
-        } while (nn.Cost > 0.001);
+        } while (nn.Cost > 0.01);
 
         Console.WriteLine(nn.Compute(0f, 0f)[0]);
         Console.WriteLine(nn.Compute(0f, 1f)[0]);
@@ -73,6 +73,8 @@ class Program
         Console.WriteLine(nn.Compute(1f, 1f)[0]);
 
         nn.Save("save.xml");
+
+        Console.WriteLine(nn);
 /*
         Console.Write("Training data arrays initialised.");
 
