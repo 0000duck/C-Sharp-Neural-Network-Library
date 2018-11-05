@@ -1,3 +1,4 @@
+<NeuralNetwork>
 <Layer Name="L0">
 	<Neuron Name="N0" />
 	<Neuron Name="N1" />
@@ -33,4 +34,4 @@
 		</IncomingWeights>
 	</Neuron>
 </Layer>
-
+</NeuralNetwork>

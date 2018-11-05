@@ -2,6 +2,7 @@
 using static Salty.Maths;
 using static System.IO.File;
 using System.Collections.Generic;
+using System.Xml;
 
 namespace Salty.AI
 {
@@ -62,6 +63,18 @@ namespace Salty.AI
             {
                 weights[i]= Matrix.Random(Structure[i + 1], Structure[i], rng);
                 biases[i] = Matrix.Random(Structure[i + 1], 1, rng);
+            }
+        }
+
+        // TODO: Implement this with an XML parser
+        public NeuralNetwork(string saveFilePath)
+        {
+            XmlDocument xml = new XmlDocument();
+            xml.Load(saveFilePath);
+
+            foreach(XmlNode node in xml.DocumentElement.ChildNodes)
+            {
+                   
             }
         }
 
@@ -270,6 +283,7 @@ namespace Salty.AI
         {
             List<string> lines = new List<string>();
             
+            lines.Add("<NeuralNetwork>");
             for (int l = 0; l < LayerCount; l++)
             {
                 string line = $"<Layer Name=\"L{l}\">\n";
@@ -292,6 +306,7 @@ namespace Salty.AI
                 line += "</Layer>\n";
                 lines.Add(line);
             }
+            lines.Add("</NeuralNetwork>");
             System.IO.File.WriteAllLines(filePath, lines);
         }
 

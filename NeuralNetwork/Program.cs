@@ -67,12 +67,12 @@ class Program
             Console.WriteLine("Cost: " + nn.Cost);
         } while (nn.Cost > 0.01);
 
+        //NeuralNetwork nn = new NeuralNetwork("save.xml");
+
         Console.WriteLine(nn.Compute(0f, 0f)[0]);
         Console.WriteLine(nn.Compute(0f, 1f)[0]);
         Console.WriteLine(nn.Compute(1f, 0f)[0]);
         Console.WriteLine(nn.Compute(1f, 1f)[0]);
-
-        nn.Save("save.xml");
 
         Console.WriteLine(nn);
 /*
