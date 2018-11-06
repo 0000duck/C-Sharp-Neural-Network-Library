@@ -4,8 +4,8 @@ namespace Salty
 {
     public static partial class Maths
     { 
-        /// <summary>Represents a matrix object with float entries. This is a 
-        /// collection of floats, arranged in rows and columns.</summary>
+        /// <summary>Represents a matrix object with double entries. This is a 
+        /// collection of doubles, arranged in rows and columns.</summary>
         public class Matrix
         {
             /// <summary>The number of rows in the current matrix.</summary>
@@ -16,7 +16,7 @@ namespace Salty
 
             /// <summary>The 2-dimensional array that holds all entries for the 
             /// current matrix.</summary>
-            private readonly float[,] data;
+            private readonly double[,] data;
 
             /// <summary>Creates a new matrix with all entries 0.0f.</summary>
             /// <param name="rowCount">The number of rows in the current 
@@ -32,14 +32,14 @@ namespace Salty
                 }
                 RowCount = rowCount;
                 ColumnCount = columnCount;
-                this.data = new float[RowCount, ColumnCount];
+                this.data = new double[RowCount, ColumnCount];
             }
 
             /// <summary>Creates a new matrix with entries given in the 2D 
             /// array.</summary>
             /// <param name="data">The 2D array for which this matrix will take 
             /// its shape and entries.</param>
-            public Matrix(float[,] data)
+            public Matrix(double[,] data)
             {
                 RowCount = data.GetLength(0);
                 ColumnCount = data.GetLength(1);
@@ -91,7 +91,7 @@ namespace Salty
             /// <param name="column">The array whose values will fill this 
             /// column matrix.</param>
             /// <returns>The newly created column matrix.</returns>
-            public static Matrix FromArray(float[] column) 
+            public static Matrix FromArray(double[] column) 
             {
                 Matrix matrix = new Matrix(column.Length, 1);
                 matrix.SetColumn(0, column);
@@ -170,11 +170,11 @@ namespace Salty
 
                 for (int row = 0; row < product.RowCount; row++)
                 {
-                    float[] aRow = new float[n];
+                    double[] aRow = new double[n];
 
                     for (int col = 0; col < product.ColumnCount; col++)
                     {
-                        float[] bCol = new float[n];
+                        double[] bCol = new double[n];
 
                         for (int i = 0; i < n; i++)
                         {
@@ -199,7 +199,7 @@ namespace Salty
             /// <param name="k">The scalar.</param>
             /// <param name="m">The matrix to get the scaled copy of.</param>
             /// <returns>A scaled copy of the matrix.</returns>
-            public static Matrix operator *(float k, Matrix m)
+            public static Matrix operator *(double k, Matrix m)
             {
                 Matrix copy = m.Copy();
                 copy.Scale(k);
@@ -211,7 +211,7 @@ namespace Salty
             /// <param name="m">The matrix to get the scaled copy of.</param>
             /// <param name="k">The scalar.</param>
             /// <returns>A scaled copy of the matrix.</returns>
-            public static Matrix operator *(Matrix m, float k)
+            public static Matrix operator *(Matrix m, double k)
             {
                 return k * m;
             }
@@ -227,7 +227,7 @@ namespace Salty
             }
 
             /// <summary>Determines whether two matrices are equal or not. That 
-            /// is, if each matrix has element-wise equal float entries.
+            /// is, if each matrix has element-wise equal double entries.
             /// </summary>
             /// <param name="a">A matrix to test equality.</param>
             /// <param name="b">A matrix to test equality.</param>
@@ -256,9 +256,9 @@ namespace Salty
             /// </param>
             /// <returns>The old value of the entry before the new value was 
             /// set.</returns>
-            public float Set(int row, int col, float value)
+            public double Set(int row, int col, double value)
             {
-                float oldValue = value;
+                double oldValue = value;
                 HandleIndexException(row, col);
                 this.data[row, col] = value;
                 return oldValue;
@@ -270,9 +270,9 @@ namespace Salty
             /// <param name="values">The values to set this row to. Must have 
             /// length equal to the number of columns in this matrix.</param>
             /// <returns>The old row before the new values were set.</returns>
-            public float[] SetRow(int row, float[] values)
+            public double[] SetRow(int row, double[] values)
             {
-                float[] oldRow = GetRow(row);
+                double[] oldRow = GetRow(row);
                 if (values.Length != this.ColumnCount)
                 {
                     throw new ArgumentException("array to set row must have " +
@@ -293,9 +293,9 @@ namespace Salty
             /// </param>
             /// <returns>The old column before the new values were set.
             /// </returns>
-            public float[] SetColumn(int col, float[] values)
+            public double[] SetColumn(int col, double[] values)
             {
-                float[] oldColumn = GetColumn(col);
+                double[] oldColumn = GetColumn(col);
                 if (values.Length != this.RowCount)
                 {
                     throw new ArgumentException("array to set column must ha" +
@@ -314,7 +314,7 @@ namespace Salty
             /// <param name="col">The column of the entry to get.</param>
             /// <returns>The value of the entry in the current matrix at the 
             /// specified row and column.</returns>
-            public float Get(int row, int col)
+            public double Get(int row, int col)
             {
                 HandleIndexException(row, col);
                 return this.data[row, col];
@@ -327,9 +327,9 @@ namespace Salty
             /// where higher indexed elements of the 
             /// array represent entries of the matrix row which are further to 
             /// the right.</returns>
-            public float[] GetRow(int row)
+            public double[] GetRow(int row)
             {
-                float[] values = new float[ColumnCount];
+                double[] values = new double[ColumnCount];
                 for (int i = 0; i < values.Length; i++)
                 {
                     values[i] = this[row, i];
@@ -343,9 +343,9 @@ namespace Salty
             /// <returns>An array containing the entries of the desired column, 
             /// where higher indexed elements of the array represent entries of 
             /// the matrix column which are further down.</returns>
-            public float[] GetColumn(int col)
+            public double[] GetColumn(int col)
             {
-                float[] values = new float[RowCount];
+                double[] values = new double[RowCount];
                 for (int i = 0; i < values.Length; i++)
                 {
                     values[i] = this[i, col];
@@ -357,7 +357,7 @@ namespace Salty
             /// current matrix.</summary>
             /// <param name="row">The row to index.</param>
             /// <param name="col">The column to index.</param>
-            public float this[int row, int col]
+            public double this[int row, int col]
             {
                 get
                 {
@@ -372,7 +372,7 @@ namespace Salty
             /// <summary>Overloads the [] operator to get and set rows in the 
             /// current matrix.</summary>
             /// <param name="row">The row to index.</param>
-            public float[] this[int row]
+            public double[] this[int row]
             {
                 get
                 {
@@ -394,7 +394,7 @@ namespace Salty
                 {
                     for (int col = 0; col < ColumnCount; col++)
                     {
-                        this[row, col] = 2.0f * (float)rng.NextDouble() - 1.0f;
+                        this[row, col] = 2.0f * (double)rng.NextDouble() - 1.0f;
                     }
                 }
             }
@@ -435,7 +435,7 @@ namespace Salty
             /// <summary>Multiplies the current matrix by a scalar.</summary>
             /// <param name="k">The scalar to multiply the current matrix by.
             /// </param>
-            public void Scale(float k)
+            public void Scale(double k)
             {
                 for (int row = 0; row < RowCount; row++)
                 {
@@ -450,7 +450,7 @@ namespace Salty
             /// </summary>
             /// <param name="n">The value to assign all entries in the current 
             /// matrix to.</param>
-            public void Fill(float n)
+            public void Fill(double n)
             {
                 for (int row = 0; row < RowCount; row++)
                 {
@@ -485,7 +485,7 @@ namespace Salty
             /// <param name="function">The function to take each element of the 
             /// current matrix as inputs and update those elements with its 
             /// return value.</param>
-            public void Apply(Func<float, float> function)
+            public void Apply(Func<double, double> function)
             {
                 for (int row = 0; row < RowCount; row++)
                 {
@@ -506,7 +506,7 @@ namespace Salty
             /// <returns>A matrix whose elements are the return value of the 
             /// given function acting element-wise on the given matrix.
             /// </returns>
-            public static Matrix Apply(Matrix m, Func<float, float> function)
+            public static Matrix Apply(Matrix m, Func<double, double> function)
             {
                 Matrix copy = m.Copy();
                 copy.Apply(function);
@@ -548,7 +548,7 @@ namespace Salty
             }
 
             /// <summary>Determines whether a matrix is equal to this one or 
-            /// not. That is, if each matrix has element-wise equal float 
+            /// not. That is, if each matrix has element-wise equal double 
             /// entries.</summary>
             /// <param name="obj">A matrix to test equality.</param>
             /// <returns>True if and only if both matrices are equal.</returns>

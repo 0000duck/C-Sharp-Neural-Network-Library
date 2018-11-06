@@ -34,7 +34,7 @@ namespace Salty.AI {
         /// <param name="inputs">The inputs as rows in a 2D array.</param>
         /// <param name="expectedOutputs">The expected outputs as rows in a 2D 
         /// array.</param>
-        public TrainingData(float[,] inputs, float[,] expectedOutputs)
+        public TrainingData(double[,] inputs, double[,] expectedOutputs)
         {
             if (inputs.GetLength(0) != expectedOutputs.GetLength(0))
             {
@@ -85,7 +85,7 @@ namespace Salty.AI {
         /// the input at.</param>
         /// <returns>The input at the given index into the current training 
         /// data set.</returns>
-        public float[] GetInput(int i)
+        public double[] GetInput(int i)
         {
             return inputs.GetRow(i);
         }
@@ -96,7 +96,7 @@ namespace Salty.AI {
         /// the expected output at.</param>
         /// <returns>The expected output at the given index into the current 
         /// training data set.</returns>
-        public float[] GetExpectedOutput(int i)
+        public double[] GetExpectedOutput(int i)
         {
             return expectedOutputs.GetRow(i);
         }
@@ -124,8 +124,8 @@ namespace Salty.AI {
                     "too large for the given start index");
             }
 
-            float[,] miniBatchInputs = new float[miniBatchSize, InputSize];
-            float[,] miniBatchOutputs = new float[miniBatchSize, OutputSize];
+            double[,] miniBatchInputs = new double[miniBatchSize, InputSize];
+            double[,] miniBatchOutputs = new double[miniBatchSize, OutputSize];
             for (int i = 0; i < miniBatchSize; i++)
             {
                 for (int j = 0; j < InputSize; j++)

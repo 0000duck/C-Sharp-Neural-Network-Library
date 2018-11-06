@@ -15,9 +15,9 @@ class Program
 
         Random rng = new Random();
 
-        float[,] inputs = new float[60000, 784];
+        double[,] inputs = new double[60000, 784];
 
-        float[,] expectedOutputs = new float[60000, 10];
+        double[,] expectedOutputs = new double[60000, 10];
 
         int exampleIndex = 0;
         foreach (Image image in Mnist.Reader.ReadTrainingData())
@@ -28,14 +28,14 @@ class Program
                 Console.WriteLine("Loading training data " + exampleIndex / 600 + "%");
             }
 
-            float[] input = new float[784];
+            double[] input = new double[784];
             for (int i = 0; i < 28; i++)
             {
                 String row = "";
                 for (int j = 0; j < 28; j++)
                 {
                     int pixel = (int) image.Data[i, j];
-                    inputs[exampleIndex, 28 * i + j] = ((float) pixel) / 255f;
+                    inputs[exampleIndex, 28 * i + j] = ((double) pixel) / 255f;
                     row += (pixel > 0.5) ? "x" : " ";
                 }
             }
@@ -51,11 +51,11 @@ class Program
 
         NeuralNetwork nn = new NeuralNetwork(784, 10);*/
 
-        float[,] xorIn = {
+        double[,] xorIn = {
             {0f, 0f}, {0f, 1f}, {1f, 0f}, {1f, 1f}
         };
 
-        float[,] xorOut = {
+        double[,] xorOut = {
             {0f}, {1f}, {1f}, {0f}
         };
 
@@ -75,6 +75,7 @@ class Program
         Console.WriteLine(nn.Compute(1f, 1f)[0]);
 
         Console.WriteLine(nn);
+        nn.Save("save.xml");
 /*
         Console.Write("Training data arrays initialised.");
 
@@ -92,5 +93,6 @@ class Program
 
         Console.WriteLine(nn);
 */
+        NeuralNetwork nn2 = new NeuralNetwork("save.xml");
     }
 }

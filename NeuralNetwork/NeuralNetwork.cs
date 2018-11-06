@@ -24,7 +24,7 @@ namespace Salty.AI
 
         /// <summary>The cost of the current network. This is calculated during 
         /// training using the quadratic cost function.</summary>
-        public float Cost
+        public double Cost
         {
             get;
             private set;
@@ -69,13 +69,65 @@ namespace Salty.AI
         // TODO: Implement this with an XML parser
         public NeuralNetwork(string saveFilePath)
         {
-            XmlDocument xml = new XmlDocument();
-            xml.Load(saveFilePath);
+            this.rng = new Random();
 
-            foreach(XmlNode node in xml.DocumentElement.ChildNodes)
+            XmlReader r = XmlReader.Create(saveFilePath);
+            int LayerCount = 0;
+            while (r.Read())
             {
-                   
+                if (r.NodeType == XmlNodeType.Element)
+                {
+                    if (r.Name == "Layer")
+                    {
+                        LayerCount++;
+                        Console.WriteLine("LayerCount=" + LayerCount);
+                    }
+                }
             }
+            r.Close();
+
+            Structure = new int[LayerCount];
+
+            activations = new Matrix[LayerCount];
+            weights = new Matrix[LayerCount - 1];
+            biases = new Matrix[LayerCount - 1];
+
+            r = XmlReader.Create(saveFilePath);
+            int l = -1;
+            int n = 0;
+            while (r.Read())
+            {
+                if (r.NodeType == XmlNodeType.Element)
+                {
+                    if (r.Name == "Layer")
+                    {
+                        l++;
+                        n = 0;
+                    } 
+                    else if (r.Name == "Neuron")
+                    {
+                        Structure[l]++;
+                        
+                        biases[l][n, 0] = Convert.ToDouble(r.GetAttribute(0));
+                        n++;
+                    }
+                }
+            }
+            r.Close();
+            
+
+            /*while (r.Read())
+            {
+                if((r.NodeType == XmlNodeType.Element))
+                {
+                    if (r.Name == "Layer")
+                    {
+                        int l = Convert.ToInt32(r.GetAttribute("Index"));
+                        int neuronCount = 0;
+
+                    }
+                }
+            }*/
         }
 
         /// <summary>Feeds the input forward through the network to produce the 
@@ -102,7 +154,7 @@ namespace Salty.AI
         /// <param name="nEpochs">The number of epochs to train over.</param>
         /// <param name="miniBatchSize">The size of each mini-batch.</param>
         public void Train(TrainingData trainingData, 
-            float learningRate, int nEpochs, int miniBatchSize, bool log = false)
+            double learningRate, int nEpochs, int miniBatchSize, bool log = false)
         {
             miniBatchSize = Math.Min(miniBatchSize, trainingData.SampleSize);
             
@@ -144,8 +196,7 @@ namespace Salty.AI
         /// <param name="miniBatch">The mini-batch of training data to use for 
         /// determining the cost of the current network.</param>
         /// <param name="learningRate">The gradient descent step size.</param>
-        private void stepGradientDescent(TrainingData miniBatch, 
-            float learningRate)
+        private void stepGradientDescent(TrainingData miniBatch, double learningRate)
         {
             int miniBatchSize = miniBatch.SampleSize;
 
@@ -270,7 +321,7 @@ namespace Salty.AI
         /// network.</param>
         /// <returns>The current network's output for the given input.
         /// </returns>
-        public float[] Compute(params float[] input) 
+        public double[] Compute(params double[] input) 
         {
             feedForward(Matrix.FromArray(input));
             return activations[LayerCount - 1].GetColumn(0);
@@ -279,35 +330,44 @@ namespace Salty.AI
         /// <summary>Saves the current network in an XML format to the desired 
         /// path.</summary>
         /// <param name="filePath">The system path to save to.</param>
-        public void Save(string filePath)
+        public void Save(string saveFilePath)
         {
-            List<string> lines = new List<string>();
-            
-            lines.Add("<NeuralNetwork>");
+            XmlWriter xml = XmlWriter.Create(saveFilePath);
+            xml.WriteStartDocument();
+
+            xml.WriteStartElement("NeuralNetwork");
             for (int l = 0; l < LayerCount; l++)
             {
-                string line = $"<Layer Name=\"L{l}\">\n";
+                xml.WriteStartElement("Layer");
+                xml.WriteAttributeString("Index", $"{l}");
                 for (int i = 0; i < Structure[l]; i++)
                 {
-                    line += $"\t<Neuron Name=\"N{i}\"";
+                    xml.WriteStartElement("Neuron");
+                    xml.WriteAttributeString("Index", $"{i}");
+
+                    // Don't write the biases or incoming weights to the input
                     if (l == 0)
                     {
-                        line += " />\n";
+                        xml.WriteEndElement();
                         continue;
                     }
-                    line += $" Bias=\"{biases[l - 1][i, 0]}\">\n\t\t<IncomingWeights>\n";
+                    
+                    xml.WriteAttributeString("Bias", $"{biases[l - 1][i, 0]}");
+
                     for (int j = 0; j < Structure[l - 1]; j++)
                     {
-                        line += $"\t\t\t<Weight Layer=\"L{l - 1}\" Neuron=\"N{j}\" Strength=\"{weights[l - 1][i, j]}\" />\n";
+                        xml.WriteStartElement("IncomingConnection");
+                        xml.WriteAttributeString("FromNeuronIndex", $"{j}");
+                        xml.WriteAttributeString("Weight", $"{weights[l - 1][i, j]}");
+                        xml.WriteEndElement();
                     }
-                    
-                    line += "\t\t</IncomingWeights>\n\t</Neuron>\n";
+                    xml.WriteEndElement();
                 }
-                line += "</Layer>\n";
-                lines.Add(line);
+                xml.WriteEndElement();
             }
-            lines.Add("</NeuralNetwork>");
-            System.IO.File.WriteAllLines(filePath, lines);
+
+            xml.WriteEndDocument();
+            xml.Close();
         }
 
         /// <summary>The sigmoid/logistic function which serves as the 
@@ -315,9 +375,9 @@ namespace Salty.AI
         /// <param name="x">The input to this function.</param>
         /// <returns>The output to the sigmoid/logistic function for the given 
         /// input.</returns>
-        private static float sigmoid(float x)
+        private static double sigmoid(double x)
         {
-            return (1f / (1f + (float) Math.Pow(Math.E, -x)));
+            return (1f / (1f + (double) Math.Pow(Math.E, -x)));
         }
 
         /// <summary>The derivative of the sigmoid/logistic function.</summary>
@@ -325,9 +385,9 @@ namespace Salty.AI
         /// sigmoid/logistic function at.</param>
         /// <returns>The value of the derivative of the sigmoid/logistic 
         /// function evaluated at the given input.</returns>
-        private static float derivativeOfSigmoid(float x)
+        private static double derivativeOfSigmoid(double x)
         {
-            float s = sigmoid(x);
+            double s = sigmoid(x);
             return s * (1 - s);
         }
 

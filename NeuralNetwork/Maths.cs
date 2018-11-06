@@ -7,10 +7,10 @@
         /// <param name="nums">The floating point numbers to make up the 
         /// elements of the array to sum.</param>
         /// <returns>The sum of the all elements in the array.</returns>
-        public static float Sum(params float[] nums)
+        public static double Sum(params double[] nums)
         {
-            float sum = 0f;
-            foreach (float num in nums)
+            double sum = 0;
+            foreach (double num in nums)
             {
                 sum += num;
             }
