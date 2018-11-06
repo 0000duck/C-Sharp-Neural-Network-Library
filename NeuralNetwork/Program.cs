@@ -51,7 +51,7 @@ class Program
 
         NeuralNetwork nn = new NeuralNetwork(784, 10);*/
 
-        double[,] xorIn = {
+        /*double[,] xorIn = {
             {0f, 0f}, {0f, 1f}, {1f, 0f}, {1f, 1f}
         };
 
@@ -65,7 +65,7 @@ class Program
         do {        
             nn.Train(xorTrain, 0.1f, 5, 3);
             Console.WriteLine("Cost: " + nn.Cost);
-        } while (nn.Cost > 0.01);
+        } while (nn.Cost > 0.1);
 
         //NeuralNetwork nn = new NeuralNetwork("save.xml");
 
@@ -75,7 +75,7 @@ class Program
         Console.WriteLine(nn.Compute(1f, 1f)[0]);
 
         Console.WriteLine(nn);
-        nn.Save("save.xml");
+        nn.Save("save.xml");*/
 /*
         Console.Write("Training data arrays initialised.");
 
@@ -94,5 +94,6 @@ class Program
         Console.WriteLine(nn);
 */
         NeuralNetwork nn2 = new NeuralNetwork("save.xml");
+        Console.WriteLine(nn2);
     }
 }

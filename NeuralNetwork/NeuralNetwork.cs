@@ -72,7 +72,7 @@ namespace Salty.AI
             this.rng = new Random();
 
             XmlReader r = XmlReader.Create(saveFilePath);
-            int LayerCount = 0;
+            LayerCount = 0;
             while (r.Read())
             {
                 if (r.NodeType == XmlNodeType.Element)
@@ -80,7 +80,6 @@ namespace Salty.AI
                     if (r.Name == "Layer")
                     {
                         LayerCount++;
-                        Console.WriteLine("LayerCount=" + LayerCount);
                     }
                 }
             }
@@ -88,13 +87,31 @@ namespace Salty.AI
 
             Structure = new int[LayerCount];
 
+            r = XmlReader.Create(saveFilePath);
+            int l = -1;
+            while (r.Read())
+            {
+                if (r.NodeType == XmlNodeType.Element)
+                {
+                    if (r.Name == "Layer")
+                    {
+                        l++;
+                    } 
+                    else if (r.Name == "Neuron")
+                    {
+                        Structure[l]++;
+                    }
+                }
+            }
+            r.Close();
+
             activations = new Matrix[LayerCount];
             weights = new Matrix[LayerCount - 1];
             biases = new Matrix[LayerCount - 1];
 
             r = XmlReader.Create(saveFilePath);
-            int l = -1;
             int n = 0;
+            l = -1;
             while (r.Read())
             {
                 if (r.NodeType == XmlNodeType.Element)
@@ -103,31 +120,25 @@ namespace Salty.AI
                     {
                         l++;
                         n = 0;
+                        if (l > 0)
+                        {
+                            biases[l - 1] = new Matrix(Structure[l], 1);
+                            weights[l - 1] = new Matrix(Structure[l], Structure[l - 1]);
+                        }
                     } 
-                    else if (r.Name == "Neuron")
+                    else if (r.Name == "Neuron" && l > 0)
                     {
-                        Structure[l]++;
-                        
-                        biases[l][n, 0] = Convert.ToDouble(r.GetAttribute(0));
+                        biases[l - 1][n, 0] = Convert.ToDouble(r.GetAttribute("Bias"));
                         n++;
+                    }
+                    else if (r.Name == "IncomingConnection")
+                    {
+                        int fromNeuronIndex = Convert.ToInt32(r.GetAttribute("FromNeuronIndex"));
+                        weights[l - 1][n - 1, fromNeuronIndex] = Convert.ToDouble(r.GetAttribute("Weight"));
                     }
                 }
             }
             r.Close();
-            
-
-            /*while (r.Read())
-            {
-                if((r.NodeType == XmlNodeType.Element))
-                {
-                    if (r.Name == "Layer")
-                    {
-                        int l = Convert.ToInt32(r.GetAttribute("Index"));
-                        int neuronCount = 0;
-
-                    }
-                }
-            }*/
         }
 
         /// <summary>Feeds the input forward through the network to produce the 

@@ -1,1 +1,5 @@
-﻿<?xml version="1.0" encoding="utf-8"?><NeuralNetwork><Layer Index="0"><Neuron Index="0" /><Neuron Index="1" /></Layer><Layer Index="1"><Neuron Index="0" Bias="-0.00367905068991987"><IncomingConnection FromNeuronIndex="0" Weight="-0.87898927673637" /><IncomingConnection FromNeuronIndex="1" Weight="-0.00438164015885367" /></Neuron><Neuron Index="1" Bias="1.22434378297614"><IncomingConnection FromNeuronIndex="0" Weight="3.16351458933977" /><IncomingConnection FromNeuronIndex="1" Weight="-1.3691554156197" /></Neuron><Neuron Index="2" Bias="-0.651197925730186"><IncomingConnection FromNeuronIndex="0" Weight="4.41788158575091" /><IncomingConnection FromNeuronIndex="1" Weight="3.65394231401741" /></Neuron></Layer><Layer Index="2"><Neuron Index="0" Bias="-1.05406086914997"><IncomingConnection FromNeuronIndex="0" Weight="0.141716211556427" /><IncomingConnection FromNeuronIndex="1" Weight="-2.74050511926093" /><IncomingConnection FromNeuronIndex="2" Weight="3.75490989094766" /></Neuron></Layer></NeuralNetwork>
+﻿<NeuralNetwork>
+ <Layer Index = "0">
+	<Neuron Index = "0" />
+</Layer>
+</NeuralNetwork>
