@@ -7,9 +7,9 @@ class Program
 {
     public static void Main(string[] args)
     {
-        /*FileStream filestream = new FileStream("out.txt", FileMode.Create);
-        StreamWriter streamwriter = new StreamWriter(filestream);
-        streamwriter.AutoFlush = true;
+        //FileStream filestream = new FileStream("out.txt", FileMode.Create);
+        //StreamWriter streamwriter = new StreamWriter(filestream);
+        //streamwriter.AutoFlush = true;
         //Console.SetOut(streamwriter);
         //Console.SetError(streamwriter);
 
@@ -49,14 +49,14 @@ class Program
             exampleIndex++;
         }
 
-        NeuralNetwork nn = new NeuralNetwork(784, 10);*/
+        NeuralNetwork nn = new NeuralNetwork(784, 10);
 
         /*double[,] xorIn = {
-            {0f, 0f}, {0f, 1f}, {1f, 0f}, {1f, 1f}
+            {0, 0}, {0, 1}, {1, 0}, {1, 1}
         };
 
         double[,] xorOut = {
-            {0f}, {1f}, {1f}, {0f}
+            {0}, {1}, {1}, {0}
         };
 
         TrainingData xorTrain = new TrainingData(xorIn, xorOut);
@@ -65,35 +65,30 @@ class Program
         do {        
             nn.Train(xorTrain, 0.1f, 5, 3);
             Console.WriteLine("Cost: " + nn.Cost);
-        } while (nn.Cost > 0.1);
-
-        //NeuralNetwork nn = new NeuralNetwork("save.xml");
+        } while (nn.Cost > 0.00015);
 
         Console.WriteLine(nn.Compute(0f, 0f)[0]);
         Console.WriteLine(nn.Compute(0f, 1f)[0]);
         Console.WriteLine(nn.Compute(1f, 0f)[0]);
         Console.WriteLine(nn.Compute(1f, 1f)[0]);
 
-        Console.WriteLine(nn);
         nn.Save("save.xml");*/
-/*
-        Console.Write("Training data arrays initialised.");
+
+        Console.WriteLine("Training data arrays initialised.");
 
         TrainingData td = new TrainingData(inputs, expectedOutputs);
 
-        Console.Write("Training data filled into stucture.");
+        Console.WriteLine("Training data filled into stucture.");
 
         Console.WriteLine("Beginning training.");
         do
         {
-            nn.Train(td, 3f, 1, 128);
+            nn.Train(td, 3f, 1, 128, true);
             Console.WriteLine("Cost this iteration: " + nn.Cost);
         } 
-        while (false);
+        while (nn.Cost > 0.01);
 
         Console.WriteLine(nn);
-*/
-        NeuralNetwork nn2 = new NeuralNetwork("save.xml");
-        Console.WriteLine(nn2);
+
     }
 }

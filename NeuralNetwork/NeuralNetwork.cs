@@ -172,6 +172,7 @@ namespace Salty.AI
             for (int i = 0; i < nEpochs; i++)
             {
                 // Randomise the training data
+                Console.WriteLine("Epoch " + i + " of " + nEpochs + ": Shuffling data...");
                 trainingData.Shuffle(rng);
 
                 /* Pick out as many mini-batches as we can to cover al training 
@@ -191,8 +192,7 @@ namespace Salty.AI
                     if (log)
                     {
                         Console.WriteLine(
-                            "Epoch " + i + " of " + nEpochs + ": Processing mini" +
-                            "-batch " + j + " of " + nMiniBatches);
+                            "Processing mini-batch " + j + " of " + nMiniBatches);
                     }
                     stepGradientDescent(miniBatch, learningRate);
                 }

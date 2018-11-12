@@ -55,28 +55,28 @@ namespace Salty.AI {
         /// training data set.</param>
         public void Shuffle(Random rng)
         {
-            int[] randIndices = new int[SampleSize];
-            for (int i = 0; i < SampleSize - 1; i++)
+            // Get an array of indices
+            int[] indices = new int[SampleSize];
+            for (int i = 0; i < SampleSize; i++) 
             {
-                int randIndex = rng.Next(SampleSize);
-                while (randIndices.Contains(randIndex))
-                {
-                    randIndex = rng.Next(SampleSize);
-                }
-                randIndices[i] = randIndex;
+                indices[i] = i;
             }
 
-            Matrix randInputs = new Matrix(SampleSize, InputSize);
-            Matrix randOutputs = new Matrix(SampleSize, OutputSize);
-            for (int i = 0; i < SampleSize; i++)
+            // Shuffle the indices
+            indices = indices.OrderBy(x => rng.Next()).ToArray();
+
+            // Suffle the rows of both matrices
+            Matrix inShuffled = new Matrix(SampleSize, InputSize);
+            Matrix outShuffled = new Matrix(SampleSize, OutputSize);
+
+            for (int i = 0; i < SampleSize; i++) 
             {
-                int randIndex = randIndices[i];
-                randInputs.SetRow(i, inputs.GetRow(randIndex));
-                randOutputs.SetRow(i, expectedOutputs.GetRow(randIndex));
+                inShuffled.SetRow(i, inputs.GetRow(indices[i]));
+                outShuffled.SetRow(i, expectedOutputs.GetRow(indices[i]));
             }
 
-            inputs = randInputs;
-            expectedOutputs = randOutputs;
+            inputs = inShuffled;
+            expectedOutputs = outShuffled;
         }
 
         /// <summary>Returns the input at the given index into the current 

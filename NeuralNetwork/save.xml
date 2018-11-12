@@ -1,5 +1,1 @@
-﻿<NeuralNetwork>
- <Layer Index = "0">
-	<Neuron Index = "0" />
-</Layer>
-</NeuralNetwork>
+﻿<?xml version="1.0" encoding="utf-8"?><NeuralNetwork><Layer Index="0"><Neuron Index="0" /><Neuron Index="1" /></Layer><Layer Index="1"><Neuron Index="0" Bias="-3.18266512178435"><IncomingConnection FromNeuronIndex="0" Weight="5.85765912717185" /><IncomingConnection FromNeuronIndex="1" Weight="-6.01967705655225" /></Neuron><Neuron Index="1" Bias="2.92149640949029"><IncomingConnection FromNeuronIndex="0" Weight="5.94164815901508" /><IncomingConnection FromNeuronIndex="1" Weight="-5.67170787446717" /></Neuron><Neuron Index="2" Bias="1.18440034370803"><IncomingConnection FromNeuronIndex="0" Weight="-0.0177874639087556" /><IncomingConnection FromNeuronIndex="1" Weight="0.424059069521406" /></Neuron></Layer><Layer Index="2"><Neuron Index="0" Bias="2.75393874400018"><IncomingConnection FromNeuronIndex="0" Weight="9.50369676953495" /><IncomingConnection FromNeuronIndex="1" Weight="-9.18085382912575" /><IncomingConnection FromNeuronIndex="2" Weight="2.0484799184054" /></Neuron></Layer></NeuralNetwork>
